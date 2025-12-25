@@ -7,21 +7,21 @@ import { Button } from './ui/Button';
 import { PaletteModal } from './PaletteModal';
 
 export const RightPanel: React.FC = () => {
-  const { 
-    language, 
-    palette, 
-    disabledColorIds, 
+  const {
+    language,
+    palette,
+    disabledColorIds,
     toggleColorOwnership,
     pattern
   } = useAppStore();
-  
+
   const t = TRANSLATIONS[language];
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Calculate stats
   const stats = useMemo(() => {
     if (!pattern) return [];
-    
+
     const counts: Record<string, number> = {};
     pattern.grid.forEach(row => {
       row.forEach(pixel => {
@@ -43,18 +43,18 @@ export const RightPanel: React.FC = () => {
   }, [stats]);
 
   const handleDownload = () => {
-    const jsonString = `data:text/json;chatset=utf-8,${encodeURIComponent(
-      JSON.stringify({ pattern: pattern, stats: stats }, null, 2)
-    )}`;
+    const canvas = document.getElementById('pixel-export-canvas') as HTMLCanvasElement;
+    if (!canvas) return;
+
     const link = document.createElement("a");
-    link.href = jsonString;
-    link.download = "pixelcraft-pattern.json";
+    link.download = "pixelcraft-pattern.png";
+    link.href = canvas.toDataURL("image/png");
     link.click();
   };
 
   return (
     <aside className="w-full md:w-80 flex-shrink-0 flex flex-col gap-4 h-full overflow-hidden">
-      
+
       <PaletteModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
 
       {/* Stats Panel */}
@@ -63,17 +63,17 @@ export const RightPanel: React.FC = () => {
           <span className="text-xs text-gray-500 font-mono">{t.totalBeads}</span>
           <span className="font-bold text-xl font-pixel">{totalBeads}</span>
         </div>
-        
+
         <div className="overflow-y-auto pr-2 flex-1 space-y-2 custom-scrollbar p-1">
           {stats.length === 0 ? (
             <div className="text-center text-gray-400 text-sm py-4 italic">{t.emptyState}</div>
           ) : (
             stats.map(({ color, count }) => (
-              <div 
-                key={color!.id} 
+              <div
+                key={color!.id}
                 className="flex items-center gap-3 text-sm p-2 border border-transparent hover:bg-white hover:border-black hover:shadow-hard-sm transition-all duration-150"
               >
-                <div 
+                <div
                   className="w-4 h-4 border border-black shadow-[1px_1px_0_0_rgba(0,0,0,1)]"
                   style={{ backgroundColor: color!.hex }}
                 />
@@ -86,9 +86,9 @@ export const RightPanel: React.FC = () => {
             ))
           )}
         </div>
-        
-        <Button 
-          onClick={handleDownload} 
+
+        <Button
+          onClick={handleDownload}
           disabled={!pattern}
           className="mt-4 w-full flex items-center justify-center gap-2"
         >
@@ -101,7 +101,7 @@ export const RightPanel: React.FC = () => {
       <Card className="max-h-[300px] flex flex-col">
         <div className="flex justify-between items-center mb-4 border-b-2 border-black pb-2">
           <h3 className="font-pixel text-xs md:text-sm uppercase tracking-wide">{t.palette}</h3>
-          <button 
+          <button
             onClick={() => setIsModalOpen(true)}
             className="p-1 hover:bg-black hover:text-white transition-colors rounded-sm"
             title={t.managePalette}
@@ -114,7 +114,7 @@ export const RightPanel: React.FC = () => {
           {palette.map((color) => {
             const isOwned = !disabledColorIds.includes(color.id);
             return (
-              <div 
+              <div
                 key={color.id}
                 onClick={() => toggleColorOwnership(color.id)}
                 className={`
@@ -130,16 +130,16 @@ export const RightPanel: React.FC = () => {
                 ) : (
                   <Square size={16} className="text-gray-300" />
                 )}
-                
-                <div 
+
+                <div
                   className="w-4 h-4 border border-black rounded-sm"
                   style={{ backgroundColor: color.hex }}
                 />
-                
+
                 <span className={`text-xs font-mono flex-1 ${!isOwned && 'line-through decoration-black'}`}>
                   {color.name}
                 </span>
-                
+
                 <span className="text-[10px] text-gray-400 font-mono">{color.id}</span>
               </div>
             );

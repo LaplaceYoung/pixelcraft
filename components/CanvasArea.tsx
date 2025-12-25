@@ -140,7 +140,7 @@ export const CanvasArea: React.FC = () => {
               }}
               className="bg-white shadow-xl z-10"
             >
-              <canvas ref={canvasRef} className="block pixelated" />
+              <canvas ref={canvasRef} id="pixel-export-canvas" className="block pixelated" />
             </div>
           ) : (
             <div className="text-center text-gray-400 font-mono pointer-events-none">
