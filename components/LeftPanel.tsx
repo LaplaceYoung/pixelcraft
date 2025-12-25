@@ -1,5 +1,5 @@
 import React from 'react';
-import { Upload, Sliders, Languages } from 'lucide-react';
+import { Upload, Sliders, Languages, Github } from 'lucide-react';
 import { useAppStore } from '../store';
 import { TRANSLATIONS } from '../constants';
 import { Card } from './ui/Card';
@@ -113,9 +113,22 @@ export const LeftPanel: React.FC = () => {
       </Card>
 
       {/* Info text */}
-      <div className="text-[10px] text-gray-500 font-mono p-2 leading-tight opacity-50 hover:opacity-100 transition-opacity">
-        <p>V 1.0.1</p>
-        <p>Designed with ❤️ for Pixel Artists.</p>
+      {/* Info text */}
+      <div className="flex flex-col gap-2 p-2 opacity-50 hover:opacity-100 transition-opacity">
+        <a
+          href="https://github.com/LaplaceYoung/pixelcraft"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 text-xs font-mono font-bold hover:text-retro-red transition-colors group"
+        >
+          <Github size={14} />
+          <span>Star on GitHub</span>
+          <span className="opacity-0 group-hover:opacity-100 transition-opacity">★</span>
+        </a>
+        <div className="text-[10px] text-gray-500 font-mono leading-tight">
+          <p>V 1.0.1</p>
+          <p>Designed with ❤️ for Pixel Artists.</p>
+        </div>
       </div>
     </aside>
   );
