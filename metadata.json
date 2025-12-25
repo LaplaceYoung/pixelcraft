@@ -1,0 +1,5 @@
+{
+  "name": "PixelCraft",
+  "description": "A refined, brutalist-style Perler bead pattern generator. Converts images to pixel art patterns using real-world bead colors.",
+  "requestFramePermissions": []
+}
