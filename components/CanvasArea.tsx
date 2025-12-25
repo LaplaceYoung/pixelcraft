@@ -103,7 +103,7 @@ export const CanvasArea: React.FC = () => {
     <div className="flex-1 flex flex-col h-full min-h-[400px]">
       <div className="bg-white border-2 border-black shadow-hard flex-1 relative overflow-hidden flex flex-col">
         {/* Toolbar */}
-        <div className="absolute top-4 right-4 z-10 flex gap-2">
+        <div className="absolute top-4 right-4 z-50 flex gap-2">
           <button
             onClick={() => handleZoom(-0.1)}
             className="bg-white border-2 border-black p-2 hover:bg-gray-100 shadow-hard-sm"
