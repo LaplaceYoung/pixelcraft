@@ -3,17 +3,19 @@ import { useAppStore } from '../store';
 import { Card } from './ui/Card';
 import { TRANSLATIONS } from '../constants';
 import { ZoomIn, ZoomOut, Maximize } from 'lucide-react';
+import { UploadArea } from './UploadArea';
 
 export const CanvasArea: React.FC = () => {
-  const { 
-    pattern, 
-    palette, 
-    showGrid, 
-    showNumbers, 
+  const {
+    pattern,
+    palette,
+    showGrid,
+    showNumbers,
     language,
-    originalImage
+    originalImage,
+    setOriginalImage
   } = useAppStore();
-  
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [zoom, setZoom] = useState(1);
@@ -29,7 +31,7 @@ export const CanvasArea: React.FC = () => {
     // Define pixel size based on visual requirement, not actual bead size.
     // 20px per bead is good for visibility.
     const PIXEL_SIZE = 20;
-    
+
     // Set canvas dimensions
     canvas.width = pattern.width * PIXEL_SIZE;
     canvas.height = pattern.height * PIXEL_SIZE;
@@ -55,16 +57,16 @@ export const CanvasArea: React.FC = () => {
           // Bead effect (subtle circle/shadow)
           // To make it look more like beads, we can draw a lighter circle inside
           if (!showNumbers) {
-             ctx.fillStyle = 'rgba(255,255,255,0.2)';
-             ctx.beginPath();
-             ctx.arc(x * PIXEL_SIZE + PIXEL_SIZE/2, y * PIXEL_SIZE + PIXEL_SIZE/2, PIXEL_SIZE/4, 0, Math.PI * 2);
-             ctx.fill();
-             
-             // Hole
-             ctx.fillStyle = 'rgba(0,0,0,0.15)';
-             ctx.beginPath();
-             ctx.arc(x * PIXEL_SIZE + PIXEL_SIZE/2, y * PIXEL_SIZE + PIXEL_SIZE/2, PIXEL_SIZE/8, 0, Math.PI * 2);
-             ctx.fill();
+            ctx.fillStyle = 'rgba(255,255,255,0.2)';
+            ctx.beginPath();
+            ctx.arc(x * PIXEL_SIZE + PIXEL_SIZE / 2, y * PIXEL_SIZE + PIXEL_SIZE / 2, PIXEL_SIZE / 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Hole
+            ctx.fillStyle = 'rgba(0,0,0,0.15)';
+            ctx.beginPath();
+            ctx.arc(x * PIXEL_SIZE + PIXEL_SIZE / 2, y * PIXEL_SIZE + PIXEL_SIZE / 2, PIXEL_SIZE / 8, 0, Math.PI * 2);
+            ctx.fill();
           }
 
           // ID Numbers
@@ -74,8 +76,8 @@ export const CanvasArea: React.FC = () => {
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             // Only draw part of ID to save space, e.g. P05 -> 05
-            const shortId = color.id.replace(/[A-Z]/g, ''); 
-            ctx.fillText(shortId, x * PIXEL_SIZE + PIXEL_SIZE/2, y * PIXEL_SIZE + PIXEL_SIZE/2);
+            const shortId = color.id.replace(/[A-Z]/g, '');
+            ctx.fillText(shortId, x * PIXEL_SIZE + PIXEL_SIZE / 2, y * PIXEL_SIZE + PIXEL_SIZE / 2);
           }
         }
       });
@@ -86,10 +88,10 @@ export const CanvasArea: React.FC = () => {
   // Helper for text contrast
   const getContrastYIQ = (hexcolor: string) => {
     hexcolor = hexcolor.replace("#", "");
-    const r = parseInt(hexcolor.substr(0,2),16);
-    const g = parseInt(hexcolor.substr(2,2),16);
-    const b = parseInt(hexcolor.substr(4,2),16);
-    const yiq = ((r*299)+(g*587)+(b*114))/1000;
+    const r = parseInt(hexcolor.substr(0, 2), 16);
+    const g = parseInt(hexcolor.substr(2, 2), 16);
+    const b = parseInt(hexcolor.substr(4, 2), 16);
+    const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
     return (yiq >= 128) ? 'black' : 'white';
   };
 
@@ -102,19 +104,19 @@ export const CanvasArea: React.FC = () => {
       <div className="bg-white border-2 border-black shadow-hard flex-1 relative overflow-hidden flex flex-col">
         {/* Toolbar */}
         <div className="absolute top-4 right-4 z-10 flex gap-2">
-          <button 
+          <button
             onClick={() => handleZoom(-0.1)}
             className="bg-white border-2 border-black p-2 hover:bg-gray-100 shadow-hard-sm"
           >
             <ZoomOut size={20} />
           </button>
-          <button 
+          <button
             onClick={() => setZoom(1)}
             className="bg-white border-2 border-black p-2 hover:bg-gray-100 shadow-hard-sm font-mono text-xs flex items-center"
           >
             {Math.round(zoom * 100)}%
           </button>
-          <button 
+          <button
             onClick={() => handleZoom(0.1)}
             className="bg-white border-2 border-black p-2 hover:bg-gray-100 shadow-hard-sm"
           >
@@ -123,32 +125,30 @@ export const CanvasArea: React.FC = () => {
         </div>
 
         {/* Workspace */}
-        <div 
-          ref={containerRef}
-          className="flex-1 overflow-auto p-8 bg-[#e5e5e5] flex items-center justify-center"
-          style={{
-             backgroundImage: 'radial-gradient(#ccc 1px, transparent 1px)',
-             backgroundSize: '10px 10px'
-          }}
+        <UploadArea
+          onUpload={setOriginalImage}
+          t={t}
+          disableClick={!!originalImage}
+          className="flex-1 overflow-auto p-8 bg-[#e5e5e5] flex items-center justify-center relative w-full h-full"
         >
           {originalImage ? (
-            <div 
-              style={{ 
+            <div
+              style={{
                 transform: `scale(${zoom})`,
                 transformOrigin: 'center center',
                 transition: 'transform 0.1s ease-out'
               }}
-              className="bg-white shadow-xl"
+              className="bg-white shadow-xl z-10"
             >
               <canvas ref={canvasRef} className="block pixelated" />
             </div>
           ) : (
-             <div className="text-center text-gray-400 font-mono">
-                <Maximize size={48} className="mx-auto mb-4 opacity-20" />
-                <p>{t.emptyState}</p>
-             </div>
+            <div className="text-center text-gray-400 font-mono pointer-events-none">
+              <Maximize size={48} className="mx-auto mb-4 opacity-20" />
+              <p>{t.emptyState}</p>
+            </div>
           )}
-        </div>
+        </UploadArea>
       </div>
     </div>
   );
